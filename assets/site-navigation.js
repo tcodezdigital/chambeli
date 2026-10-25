@@ -5,7 +5,33 @@
  const menu=header.querySelector('.ch-menu-button');
  const button=header.querySelector('.ch-dropdown-button');
  const dropdown=header.querySelector('#department-dropdown');
- const mobile=matchMedia('(max-width:960px)');
+ // Add the sponsorship destination to every existing shared header.
+ const sponsorPath='/category/sponsor-a-child/';
+ let sponsor=nav.querySelector('a[data-sponsor-navigation]')||nav.querySelector('a[href="'+sponsorPath+'"]')||nav.querySelector('a[href="/sponsor-a-child/"]');
+ if(!sponsor){
+  sponsor=document.createElement('a');
+  sponsor.textContent='Sponsor a Child';
+  sponsor.href=sponsorPath;
+  const gallery=nav.querySelector('a[href="/gallery/"]');
+  const donate=nav.querySelector('.ch-donate');
+  nav.insertBefore(sponsor,gallery||donate||null);
+ }
+ sponsor.setAttribute('data-sponsor-navigation','true');
+ sponsor.setAttribute('href',sponsorPath);
+ // Determine the active page from the URL, including named sponsorship profiles.
+ const normalize=p=>{let path=p.replace(/\/index\.html$/,'/');if(!path.endsWith('/'))path+='/';return path;};
+ const current=normalize(window.location.pathname);
+ const profilePaths=['/muhammad-ali-hasnain/','/muhammad-alyan/','/muhammad-yasir-khan/'];
+ nav.querySelectorAll('a').forEach(a=>{
+  a.removeAttribute('aria-current');
+  a.classList.remove('ch-parent-active');
+  const target=normalize(new URL(a.getAttribute('href'),window.location.href).pathname);
+  if(target===current)a.setAttribute('aria-current','page');
+ });
+ if(current==='/sponsor-a-child/'||current===sponsorPath)sponsor.setAttribute('aria-current','page');
+ if(profilePaths.includes(current))sponsor.classList.add('ch-parent-active');
+ if(['/school/','/rehabilitation-and-fitness-center/','/female-vocational-training-center/'].includes(current))header.querySelector('.ch-dept-link').classList.add('ch-parent-active');
+ const mobile=matchMedia('(max-width:1060px)');
  const department=header.querySelector('.ch-department');
  function closeDropdown(){dropdown.hidden=true;button.setAttribute('aria-expanded','false');}
  function closeMenu(){menu.setAttribute('aria-expanded','false');nav.hidden=mobile.matches;closeDropdown();}
